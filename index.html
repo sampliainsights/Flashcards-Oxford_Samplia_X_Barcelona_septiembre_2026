@@ -668,7 +668,7 @@
     /* ═══ TIRA DE KPI ══════════════════════════════════════════════════ */
     .kpis {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+      grid-template-columns: repeat(7, minmax(0, 1fr));
       gap: 0;
       margin-top: clamp(34px, 4.5vw, 56px);
       border-top: 1px solid var(--line);
@@ -676,7 +676,7 @@
     }
 
     .kpi {
-      padding: 24px 22px 22px 0;
+      padding: 24px 16px 22px 0;
       border-right: 1px solid var(--line);
       min-width: 0;
     }
@@ -686,11 +686,11 @@
     }
 
     .kpi:not(:first-child) {
-      padding-left: 22px;
+      padding-left: 16px;
     }
 
     .kpi-v {
-      font-size: clamp(28px, 3.2vw, 42px);
+      font-size: clamp(26px, 2.6vw, 38px);
       font-weight: 800;
       line-height: 1;
       letter-spacing: -.04em;
@@ -723,8 +723,48 @@
       color: var(--text-4);
     }
 
+    /* Al partirse la fila, la raya vertical sobra al final de cada fila y
+       hace falta una horizontal que separe la de arriba de la de abajo. */
+    @media (max-width: 1560px) {
+      .kpis {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .kpi:nth-child(4n) {
+        border-right: 0;
+      }
+
+      .kpi:nth-child(-n+4) {
+        border-bottom: 1px solid var(--line);
+      }
+    }
+
+    @media (max-width: 980px) {
+      .kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .kpi:nth-child(n) {
+        border-right: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .kpi:nth-child(2n),
+      .kpi:last-child {
+        border-right: 0;
+      }
+
+      .kpi:nth-last-child(-n+1) {
+        border-bottom: 0;
+      }
+    }
+
     @media (max-width: 720px) {
-      .kpi {
+      .kpis {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .kpi:nth-child(n) {
         border-right: 0;
         border-bottom: 1px solid var(--line);
         padding-left: 0 !important;
@@ -920,11 +960,11 @@
       align-items: flex-start;
       flex-wrap: wrap;
       justify-content: flex-end;
-      gap: 7px;
+      gap: 5px;
     }
 
     .card .sub {
-      margin-top: 7px;
+      margin-top: 16px;
       font-size: 12.5px;
       line-height: 1.5;
       color: var(--text-3);
@@ -968,7 +1008,7 @@
       gap: 5px;
       flex: 0 0 auto;
       min-height: 32px;
-      padding: 5px 10px;
+      padding: 5px 9px;
       border-radius: 999px;
       background: var(--n-100);
       border: 1px solid var(--line);
@@ -1014,6 +1054,59 @@
       color: var(--brick);
       background: rgba(194, 29, 3, .06);
       border-color: rgba(194, 29, 3, .28);
+    }
+
+    /* Minipíldora comparativa: la referencia de 2025 pegada al dato de
+       ahora, dentro de la misma insignia o del propio KPI, para que la
+       evolución se lea sin saltar a otro sitio. El color lo pone el signo
+       de la diferencia; el tamaño, el dato al que acompaña. */
+    .minipill {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 3px;
+      border-radius: 999px;
+      font-style: normal;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .minipill b {
+      font-weight: 800;
+      letter-spacing: -.01em;
+      text-transform: none;
+      color: inherit;
+    }
+
+    .scorechip .minipill {
+      margin-left: 3px;
+      padding: 1px 5px;
+      font-size: 8px;
+      letter-spacing: .01em;
+    }
+
+    .scorechip .minipill b {
+      font-size: 9.5px;
+    }
+
+    .kpi .minipill {
+      margin-left: 6px;
+      padding: 2px 6px;
+      font-size: 9px;
+      letter-spacing: .02em;
+    }
+
+    .kpi .minipill b {
+      font-size: 10.5px;
+    }
+
+    .minipill.up {
+      color: var(--ok);
+      background: rgba(47, 158, 107, .1);
+    }
+
+    .minipill.down {
+      color: var(--brick);
+      background: rgba(194, 29, 3, .09);
     }
 
     /* Leaderboard de situación académica. */
@@ -2141,6 +2234,11 @@
           <li>La pregunta abierta sobre la marca Oxford se representa mediante su categorización temática.</li>
           <li>Los filtros de género y edad recalculan todos los indicadores del informe, incluidos los KPI de cabecera y
             las lecturas de negocio.</li>
+          <li>La minipíldora verde o roja que acompaña a un dato lo compara con la promoción anterior de Oxford
+            (septiembre de 2025), cuyo valor lleva dentro junto a la diferencia: Top-2-Box del
+            código de color 85%, «Sí, seguro» sobre si ayudarán a estudiar mejor 40%, media de intención de
+            recomendación 7,76 y 53% que recomendaría. Son cifras cerradas de aquel estudio; la diferencia se calcula
+            contra el dato de la vista activa, así que se mueve con el filtro.</li>
         </ul>
       </footer>
 
@@ -2354,6 +2452,36 @@
 
     /* ── Definición del informe ─────────────────────────────────── */
     const SCALE_CAL = { 'Excelente': 5, 'Bueno': 4, 'Buena': 4, 'Aceptable': 3, 'Mejorable': 2, 'Mala': 1 };
+    /* Abanico completo de la escala verbal. Las opciones que nadie eligió
+       no llegan en los datos, así que hay que nombrarlas aquí para que el
+       eje enseñe todas las respuestas posibles y no sólo las votadas. */
+    const SCALE_CAL_ALL = ['Excelente', 'Bueno', 'Aceptable', 'Mejorable', 'Mala'];
+
+    /* ── Referencias de la promoción anterior ───────────────────── */
+    /* Cifras cerradas del estudio de la promoción de Oxford de septiembre
+       de 2025. No dependen del filtro: lo que se mueve al filtrar es el
+       dato de esta campaña y, con él, la diferencia que muestra la píldora. */
+    const BENCH_LABEL = 'Promoción Oxford · septiembre de 2025';
+    const BENCH = {
+      q5_t2b: 85,     /* Top-2-Box del código de color */
+      q6_seguro: 40,  /* «Sí, seguro» a si ayudarán a estudiar mejor */
+      q11_mean: 7.76, /* media de intención de recomendación */
+      q11_rec: 53     /* % que recomendaría */
+    };
+
+    /* Minipíldora de contraste: va dentro de la insignia, justo detrás del
+       dato de esta campaña. Sin dato actual (un filtro que deja la pregunta
+       sin base) no se pinta: comparar contra nada induce a error. */
+    function benchMini(name, ref, cur, kind) {
+      if (cur === null || cur === undefined || !isFinite(cur)) return '';
+      const d = cur - ref;
+      const val = kind === 'mean' ? df(ref, 2) : pf(ref, 0);
+      const gap = (d >= 0 ? '+' : '−')
+        + (kind === 'mean' ? df(Math.abs(d), 2) : df(Math.abs(d), 1));
+      return `<em class="minipill ${d >= 0 ? 'up' : 'down'}"`
+        + ` title="${esc(BENCH_LABEL + ' · ' + name + ': ' + val)}">`
+        + `${val}<b>${gap}</b></em>`;
+    }
 
     const Q = {
       q1: {
@@ -2428,23 +2556,23 @@
     const cardBarH = (q, d) => `
       <article class="card" id="c-${q.id}" data-reveal="card"${d ? ` style="--d:${d}"` : ''}>
         <div class="card-hd"><h3>${esc(q.t)}</h3><div class="chips" id="${q.id}_chips"></div></div>
-        ${q.note ? `<div class="sub">${esc(q.note)}</div>` : ''}
         <div class="cv" id="${q.id}_cv"><canvas id="cv-${q.id}"></canvas></div>
+        ${q.note ? `<div class="sub">${esc(q.note)}</div>` : ''}
         <div class="base" id="${q.id}_base"></div>
       </article>`;
     const cardLeaderboard = (q, d) => `
       <article class="card" id="c-${q.id}" data-reveal="card"${d ? ` style="--d:${d}"` : ''}>
         <div class="card-hd"><h3>${esc(q.t)}</h3><div class="chips" id="${q.id}_chips"></div></div>
-        ${q.note ? `<div class="sub">${esc(q.note)}</div>` : ''}
         <div class="leaderboard" id="${q.id}_leaderboard" aria-live="polite"></div>
+        ${q.note ? `<div class="sub">${esc(q.note)}</div>` : ''}
         <div class="base" id="${q.id}_base"></div>
       </article>`;
 
     const cardTreemap = (q, d) => `
       <article class="card" id="c-${q.id}" data-reveal="card"${d ? ` style="--d:${d}"` : ''}>
         <div class="card-hd"><h3>${esc(q.t)}</h3><div class="chips" id="${q.id}_chips"></div></div>
-        ${q.note ? `<div class="sub">${esc(q.note)}</div>` : ''}
         <div class="treemap" id="${q.id}_treemap" aria-live="polite"></div>
+        ${q.note ? `<div class="sub">${esc(q.note)}</div>` : ''}
         <div class="base" id="${q.id}_base"></div>
       </article>`;
 
@@ -2501,8 +2629,6 @@
       s.push(`<div class="section-pair">
       <section id="experiencia">
         <div class="s-head" data-reveal><span>04</span><h2>La experiencia en la <em>pop up</em></h2></div>
-        <p class="s-lede" data-reveal>Nota de la visita a la pop up de Samplia, en la escala declarada de Mala a
-          Excelente.</p>
         <div class="grid">
           ${cardBarH(Q.q9)}
         </div>
@@ -2510,8 +2636,6 @@
 
       <section id="marca">
         <div class="s-head" data-reveal><span>05</span><h2>La marca <em>Oxford</em></h2></div>
-        <p class="s-lede" data-reveal>Qué se lleva la gente de Oxford cuando se le pregunta en abierto. Las
-          respuestas literales se agrupan por tema para poder medirlas.</p>
         <div class="grid">
           ${cardBarH(Q.q10)}
         </div>
@@ -2674,7 +2798,7 @@
       host.innerHTML = rects.map(({ item, x, y, w, h }, i) => {
         const color = colors[i % colors.length];
         const share = pct(item.value, st.base);
-        return `<div class="treemap-tile" title="${esc(item.label)}: ${nf(item.value)} respuestas (${pf(share)})"
+        return `<div class="treemap-tile" title="${esc(item.label)}: ${pf(share)}"
           style="left:${x}%;top:${y}%;width:${w}%;height:${h}%;--tile:${color};--tile-ink:${inkOn(color)}">
           <strong>${esc(item.label)}</strong><span>${nf(item.value)} respuestas · ${pf(share)}</span>
         </div>`;
@@ -2723,8 +2847,7 @@
             },
             tooltip: tip({
               callbacks: {
-                label: c => ' ' + nf(c.parsed) + ' respuesta' + (c.parsed === 1 ? '' : 's')
-                  + ' · ' + pf(pct(c.parsed, st.base))
+                label: c => ' ' + pf(pct(c.parsed, st.base))
               }
             }),
             datalabels: {
@@ -2743,21 +2866,28 @@
       opt = opt || {};
       const id = q.id, col = q.col;
       const st = catRows(VIEW, col, { keepOrder: q.keepOrder });
+      /* Con `cats` el eje dibuja la escala entera, en su orden y con las
+         opciones a cero incluidas; sin ella, sólo las categorías votadas. */
+      const rows = opt.cats
+        ? opt.cats.map((label, i) => ({
+          label, i, value: (st.all.find(r => r.label === label) || { value: 0 }).value
+        }))
+        : st.rows;
       const box = document.getElementById(id + '_cv');
       const chips = document.getElementById(id + '_chips');
-      if (box) box.style.height = (opt.height || (st.rows.length ? hBarH(st.rows.length) : 170)) + 'px';
+      if (box) box.style.height = (opt.height || (rows.length ? hBarH(rows.length) : 170)) + 'px';
       if (charts['cv-' + id]) { charts['cv-' + id].destroy(); delete charts['cv-' + id]; }
       if (chips) chips.innerHTML = opt.chips ? opt.chips(st) : '';
       setBase(id, st.base, VIEW.length);
-      if (!st.rows.length) {
+      if (!st.base || !rows.length) {
         return failIn(box, 'Ninguna categoría con respuestas para el filtro activo.');
       }
       clearFail(box);
       const ramp = opt.ramp || BLUE_RAMP;
-      const colors = st.rows.map((r, i) => opt.colorFn
+      const colors = rows.map((r, i) => opt.colorFn
         ? opt.colorFn(r, i)
         : (NEUTRAL_RE.test(r.label) ? C.n300 : ramp[i % ramp.length]));
-      const maxV = Math.max(...st.rows.map(r => r.value));
+      const maxV = Math.max(...rows.map(r => r.value));
       /* Presupuesto del rótulo: poco más de un tercio del lienzo. Por
          encima de eso Chart.js deja de ensanchar el eje y recorta. */
       const TICK_FS = 11.5;
@@ -2767,9 +2897,9 @@
       mk('cv-' + id, {
         type: 'bar',
         data: {
-          labels: st.rows.map(r => wrapLabel(r.label, mctx, budget, 3)),
+          labels: rows.map(r => wrapLabel(r.label, mctx, budget, 3)),
           datasets: [{
-            data: st.rows.map(r => r.value),
+            data: rows.map(r => r.value),
             backgroundColor: colors, borderRadius: 5, maxBarThickness: 26
           }]
         },
@@ -2788,9 +2918,8 @@
             ...noLegend,
             tooltip: tip({
               callbacks: {
-                title: c => st.rows[c[0].dataIndex].label,
-                label: c => nf(c.parsed.x) + ' respuesta' + (c.parsed.x === 1 ? '' : 's')
-                  + ' · ' + pf(pct(c.parsed.x, st.base))
+                title: c => rows[c[0].dataIndex].label,
+                label: c => pf(pct(c.parsed.x, st.base))
               }
             }),
             datalabels: {
@@ -2833,9 +2962,9 @@
 
       if (chips) {
         chips.innerHTML =
-          `<span class="scorechip gen" title="Sobre los ${nf(genDecl)} encuestados que declaran género">
+          `<span class="scorechip gen" title="Sobre quienes declaran género">
              <i style="background:${GEN_COLOR[0]}"></i>Femenino <b>${genDecl ? pf(pct(gen[0], genDecl), 0) : '—'}</b></span>` +
-          `<span class="scorechip gen" title="Sobre los ${nf(genDecl)} encuestados que declaran género">
+          `<span class="scorechip gen" title="Sobre quienes declaran género">
              <i style="background:${GEN_COLOR[1]}"></i>Masculino <b>${genDecl ? pf(pct(gen[1], genDecl), 0) : '—'}</b></span>` +
           `<span class="scorechip">Edad promedio <b>${n ? df(sum / n, 1) : '—'}</b></span>` +
           `<span class="scorechip">Moda de la edad <b>${mode !== null ? mode : '—'}</b></span>`;
@@ -2877,7 +3006,7 @@
             tooltip: tip({
               callbacks: {
                 title: c => c[0].label + ' años',
-                label: c => nf(c.parsed.y) + ' encuestados · ' + pf(pct(c.parsed.y, n))
+                label: c => pf(pct(c.parsed.y, n))
               }
             }),
             datalabels: {
@@ -2924,7 +3053,7 @@
           <div>
             <div class="nps-split">
               ${parts.map(p => `<div style="width:0;background:${p.c};color:${inkOn(p.c)}"
-                data-w="${pct(p.v, a.n).toFixed(2)}" title="${esc(p.n)}: ${nf(p.v)}">${pct(p.v, a.n) >= 9 ? pf(pct(p.v, a.n), 0) : ''}</div>`).join('')}
+                data-w="${pct(p.v, a.n).toFixed(2)}" title="${esc(p.n)}: ${pf(pct(p.v, a.n))}">${pct(p.v, a.n) >= 9 ? pf(pct(p.v, a.n), 0) : ''}</div>`).join('')}
             </div>
             <div class="nps-key">
               ${parts.map(p => `<span><i style="background:${p.c}"></i>${esc(p.n)} <b>${pf(pct(p.v, a.n))}</b></span>`).join('')}
@@ -2937,8 +3066,10 @@
         }));
       }
       if (chips) chips.innerHTML =
-        `<span class="scorechip">Media <b>${df(a.mean, 2)}</b></span>` +
-        `<span class="scorechip">Promotores <b>${pf(pct(a.prom, a.n))}</b></span>`;
+        `<span class="scorechip">Media <b>${df(a.mean, 2)}</b>`
+        + benchMini('Media', BENCH.q11_mean, a.mean, 'mean') + `</span>` +
+        `<span class="scorechip">Promotores <b>${pf(pct(a.prom, a.n))}</b>`
+        + benchMini('Recomendarían', BENCH.q11_rec, pct(a.prom, a.n)) + `</span>`;
       mk('cv-' + id, {
         type: 'bar',
         data: {
@@ -2964,7 +3095,7 @@
             tooltip: tip({
               callbacks: {
                 title: c => 'Puntuación ' + c[0].label,
-                label: c => nf(c.parsed.y) + ' respuestas · ' + pf(pct(c.parsed.y, st.n))
+                label: c => pf(pct(c.parsed.y, st.n))
               }
             }),
             datalabels: {
@@ -2984,10 +3115,16 @@
       const usadas = countAny(VIEW, Q.q4.col, ['Sí, las he usado']);
       const pop = ordMean(VIEW, Q.q9.col, SCALE_CAL);
       const rec = npsOf(VIEW, Q.q11.col);
+      /* Los tres indicadores con referencia de 2025 llevan su minipíldora
+         aquí arriba, para que la comparación se vea antes de bajar. */
+      const color = ordMean(VIEW, Q.q5.col, SCALE_CAL);
+      const seguro = countAny(VIEW, Q.q6.col, ['Sí, seguro']);
 
-      const kpi = (v, u, l, note) => `<div class="kpi">
+      const kpi = (v, u, l, note, bench) => `<div class="kpi">
         <div class="kpi-v">${v}${u ? `<span class="kpi-u">${u}</span>` : ''}</div>
-        <div class="kpi-l">${l}</div>${note ? `<div class="kpi-n">${note}</div>` : ''}</div>`;
+        <div class="kpi-l">${l}</div>`
+        + (note || bench ? `<div class="kpi-n">${note || ''}${bench || ''}</div>` : '')
+        + `</div>`;
 
       $('#kpis').innerHTML =
         kpi(nf(VIEW.length), '', 'Encuestados',
@@ -2996,10 +3133,17 @@
           estudia.base ? nf(estudia.hit) + ' de ' + nf(estudia.base) : '') +
         kpi(usadas.base ? pf(usadas.pct) : '—', '', 'Han usado las Flashcards',
           usadas.base ? nf(usadas.hit) + ' de ' + nf(usadas.base) : '') +
+        kpi(color.n ? pf(color.t2b) : '—', '', 'Top-2-Box del código de color',
+          color.n ? 'Sólo quienes ya las han usado' : '',
+          color.n ? benchMini('Top-2-Box', BENCH.q5_t2b, color.t2b) : '') +
+        kpi(seguro.base ? pf(seguro.pct) : '—', '', '«Sí, seguro» que ayudarán a estudiar',
+          seguro.base ? 'Sólo quienes ya las han usado' : '',
+          seguro.base ? benchMini('Sí, seguro', BENCH.q6_seguro, seguro.pct) : '') +
         kpi(pop.n ? df(pop.mean, 2) : '—', pop.n ? '/5' : '', 'Valoración de la experiencia en el pop-up',
           pop.n ? 'Top-2-Box ' + pf(pop.t2b) : '') +
         kpi(rec.n ? df(rec.mean, 2) : '—', rec.n ? '/10' : '', 'Recomendación',
-          rec.n ? 'NPS ' + (rec.score >= 0 ? '+' : '−') + df(Math.abs(rec.score), 0) : '');
+          rec.n ? 'NPS ' + (rec.score >= 0 ? '+' : '−') + df(Math.abs(rec.score), 0) : '',
+          rec.n ? benchMini('Media', BENCH.q11_mean, rec.mean, 'mean') : '');
 
       $('#pdfhero-n').textContent = nf(VIEW.length) + ' encuestados'
         + (isFiltered() ? ' (filtrado)' : '');
@@ -3146,13 +3290,16 @@
 
       /* 7 · código de color */
       renderBarH(Q.q5, {
+        cats: SCALE_CAL_ALL,
         colorFn: (r, i) => r.label === 'Aceptable' ? C.red2
-          : r.label === 'Mejorable' ? C.red : BLUE_RAMP[i % BLUE_RAMP.length],
+          : (r.label === 'Mejorable' || r.label === 'Mala') ? C.red
+            : BLUE_RAMP[i % BLUE_RAMP.length],
         chips: st => {
           const m = ordMean(VIEW, Q.q5.col, SCALE_CAL);
           return m.n
             ? `<span class="scorechip">Media <b>${df(m.mean, 2)}</b>/5</span>`
-            + `<span class="scorechip">Top-2-Box <b>${pf(m.t2b)}</b></span>` : '';
+            + `<span class="scorechip">Top-2-Box <b>${pf(m.t2b)}</b>`
+            + benchMini('Top-2-Box', BENCH.q5_t2b, m.t2b) + `</span>` : '';
         }
       });
 
@@ -3160,8 +3307,10 @@
       renderBarH(Q.q6, {
         colorFn: (r, i) => /^Sí/i.test(r.label) ? BLUE_RAMP[i % BLUE_RAMP.length] : C.red,
         chips: st => {
-          const a = countAny(VIEW, Q.q6.col, ['Sí, seguro', 'Sí, posiblemente']);
-          return a.base ? `<span class="scorechip">Respuesta positiva <b>${pf(a.pct)}</b></span>` : '';
+          const seg = countAny(VIEW, Q.q6.col, ['Sí, seguro']);
+          return seg.base
+            ? `<span class="scorechip">Sí, seguro <b>${pf(seg.pct)}</b>`
+            + benchMini('Sí, seguro', BENCH.q6_seguro, seg.pct) + `</span>` : '';
         }
       });
 
@@ -3186,6 +3335,12 @@
       /* 11 · valoración de la pop up */
       renderBarH(Q.q9, {
         height: 356,
+        /* El tramo neutro en gris y el negativo en los dos rojos: la barra
+           dice por color de qué lado de la escala cae antes de leer nada. */
+        colorFn: (r, i) => r.label === 'Aceptable' ? C.n300
+          : r.label === 'Mejorable' ? C.red2
+            : r.label === 'Mala' ? C.red
+              : BLUE_RAMP[i % BLUE_RAMP.length],
         chips: st => {
           const m = ordMean(VIEW, Q.q9.col, SCALE_CAL);
           return m.n
