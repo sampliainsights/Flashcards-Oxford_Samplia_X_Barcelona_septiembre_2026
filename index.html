@@ -566,6 +566,20 @@
       color: var(--ink);
     }
 
+    .meta-note {
+      margin: 10px 0 0;
+      max-width: min(100%, 720px);
+      font-size: 7px;
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text-2);
+    }
+
+    .meta-note b {
+      font-weight: 800;
+      color: var(--ink);
+    }
+
     /* ═══ BOTONERA ═════════════════════════════════════════════════════ */
     .tools {
       display: flex;
@@ -2187,6 +2201,11 @@
           </div>
         </div>
 
+        <p class="meta-note">
+          <span>Incluye comparativa vs activación realizada en: <br>Samplia X Gran Vía:
+            Del <b>02</b> al <b>08 de septiembre de 2.025</b></span>
+        </p>
+
         <div class="fbar" id="fbar">
           <span id="fbar-txt"></span>
           <button type="button" id="fbar-clear">Quitar filtros</button>
@@ -3577,7 +3596,7 @@
              los bordes de sus piezas, en píxeles del propio lienzo. */
           const top = el.getBoundingClientRect().top;
           const cuts = new Set([cv.height]);
-          el.querySelectorAll('.card, .read, .kpis, .meta')
+          el.querySelectorAll('.card, .read, .kpis, .meta, .meta-note')
             .forEach(p => {
               const r = p.getBoundingClientRect();
               cuts.add(Math.max(0, Math.round((r.top - top - 11) * PDF.SCALE)));
