@@ -1284,6 +1284,29 @@
       opacity: .78;
     }
 
+    /* Teselas estrechas (técnicas minoritarias): el texto gira en vertical
+       para que la etiqueta quepa entera en vez de cortarse. */
+    .treemap-tile.is-vert {
+      align-items: flex-start;
+      padding: 8px 6px;
+    }
+
+    .treemap-tile.is-vert strong {
+      max-width: none;
+      max-height: calc(100% - 18px);
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+    }
+
+    .treemap-tile.is-vert span {
+      margin-top: 4px;
+      font-size: 10px;
+    }
+
+    .treemap-tile.no-pct span {
+      display: none;
+    }
+
     @media (max-width: 480px) {
       .treemap {
         height: 390px;
@@ -2772,13 +2795,13 @@
       host.innerHTML = ranked.map((row, i) => {
         const share = pct(row.value, st.base);
         const width = pct(row.value, max);
-        return `<div class="leader-row" aria-label="${esc(row.label)}: ${nf(row.value)} respuestas, ${pf(share)}">
+        return `<div class="leader-row" aria-label="${esc(row.label)}: ${pf(share)}">
           <span class="leader-rank">${i + 1}</span>
           <span class="leader-main">
             <span class="leader-label" title="${esc(row.label)}">${esc(row.label)}</span>
             <span class="leader-track"><span class="leader-fill" style="width:${width}%"></span></span>
           </span>
-          <span class="leader-value">${nf(row.value)}<small>${pf(share)}</small></span>
+          <span class="leader-value">${pf(share)}</span>
         </div>`;
       }).join('');
     }
@@ -2820,13 +2843,39 @@
       const colors = ['#23355F', '#375395', '#5B72A8', '#E0253F', '#C21D03', '#8798BF'];
       const rects = treemapLayout(st.rows, 0, 0, 100, 100);
       host.innerHTML = rects.map(({ item, x, y, w, h }, i) => {
-        const color = colors[i % colors.length];
+        const color = NEUTRAL_RE.test(item.label) ? C.n300 : colors[i % colors.length];
         const share = pct(item.value, st.base);
         return `<div class="treemap-tile" title="${esc(item.label)}: ${pf(share)}"
           style="left:${x}%;top:${y}%;width:${w}%;height:${h}%;--tile:${color};--tile-ink:${inkOn(color)}">
-          <strong>${esc(item.label)}</strong><span>${nf(item.value)} respuestas · ${pf(share)}</span>
+          <strong>${esc(item.label)}</strong><span>${pf(share)}</span>
         </div>`;
       }).join('');
+      fitTreemap(host);
+      if (!host._fitRO && window.ResizeObserver) {
+        host._fitRO = new ResizeObserver(() => fitTreemap(host));
+        host._fitRO.observe(host);
+        if (document.fonts) document.fonts.ready.then(() => fitTreemap(host));
+      }
+    }
+
+    /* Ajuste de etiquetas por tesela: baja el cuerpo hasta que el texto
+       cabe; si ni así, lo gira en vertical; y como último recurso oculta
+       el porcentaje (sigue en el title). La etiqueta nunca se recorta. */
+    function fitTreemap(host) {
+      host.querySelectorAll('.treemap-tile').forEach(t => {
+        const s = t.querySelector('strong');
+        t.classList.remove('is-vert', 'no-pct');
+        s.style.fontSize = '';
+        if (!t.clientWidth) return;
+        const fits = () => t.scrollWidth <= t.clientWidth + 1 && t.scrollHeight <= t.clientHeight + 1
+          && s.scrollWidth <= s.clientWidth + 1 && s.scrollHeight <= s.clientHeight + 1;
+        if (fits()) return;
+        const base = parseFloat(getComputedStyle(s).fontSize);
+        for (let f = base - 1; f >= 10; f--) { s.style.fontSize = f + 'px'; if (fits()) return; }
+        t.classList.add('is-vert');
+        for (let f = base; f >= 8; f--) { s.style.fontSize = f + 'px'; if (fits()) return; }
+        t.classList.add('no-pct');
+      });
     }
 
     function renderDonut(q, opt) {
